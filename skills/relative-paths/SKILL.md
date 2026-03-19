@@ -1,22 +1,34 @@
 ---
 name: relative-paths
 description: >-
-  Prefer relative paths and workspace-relative references over user-specific absolute paths. Use when generating file paths, links in code or docs, example commands, or any output that could contain /Users/username, $HOME, or machine-specific absolute paths.
+  In markdown files only: replaces user- or machine-specific absolute paths with repo- or file-relative paths. Use relative links (e.g. [file](path/to/file.md)), relative paths in code blocks and examples; avoid /Users/..., $HOME, ~/, C:\Users\.... Use when editing or generating .md files, markdown documentation, or markdown content that contains file paths or links.
 ---
 
-# Use Relative Paths, Not User-Specific Links
+# Use Relative Paths in Markdown
+
+## Scope
+
+**This skill applies only to markdown (`.md`) files.** When editing or generating markdown, use relative paths for all file references and links.
 
 ## Rule
 
-**Never emit user-specific or machine-specific absolute paths in generated output.** Use paths relative to the project/workspace root or to the current file.
+**Never emit user-specific or machine-specific absolute paths in markdown.** Use paths relative to the repo root or to the current file.
+
+**Example:** `./scripts/run-pytest.sh` ✓ — not `/Users/jane/project/scripts/run-pytest.sh` ✗
+
+## Actions
+
+- **Replace** any absolute path in markdown (links, code blocks, inline paths) with a path relative to repo root or current file.
+- **Write** markdown links as repo-relative: `[label](path/to/file.md)` or `[label](path/to/file.ts)`.
+- **Emit** paths in markdown code blocks as if from project root (e.g. `./scripts/run-pytest.sh`).
+- **Avoid** `/Users/...`, `/home/...`, `~/...`, `$HOME/...`, or `C:\Users\...` in any markdown content.
 
 ## When This Applies
 
-- File paths in code, config, or documentation
-- Links in markdown, comments, or docstrings
-- Example commands (e.g. `cd`, `cat`, file arguments)
-- References to scripts, config files, or assets
-- Error messages or logging examples that show paths
+- Editing or creating `.md` files
+- Adding or changing links in markdown (`[text](url)`)
+- Writing file paths or example commands inside markdown code blocks
+- Referencing scripts, config files, or other repo files in documentation
 
 ## Do
 
@@ -37,15 +49,15 @@ description: >-
 | `~/Projects/docs-store/...` | User-specific home path |
 | Any path containing a real username or hostname | Not portable, not shareable |
 
-## In Code and Docs
+## In Markdown
 
-- **Imports and requires:** Use project-relative paths as the project already does (e.g. `from masu.external.foo`, `import '@/components/Bar'`).
-- **Documentation links:** Link to files with repo-relative paths, e.g. `[api.ts](src/api/api.ts)` or `See scripts/run-pytest.sh`.
-- **Examples:** Show commands as if run from project root: `./scripts/run-pytest.sh`, not `./Users/me/project/scripts/run-pytest.sh`.
+- **Links:** Use repo-relative paths in link URLs, e.g. `[api.ts](src/api/api.ts)` or `[plan](docs/plans/plan.md)`.
+- **Code blocks:** Use paths as if from project root: `./scripts/run-pytest.sh`, not `/Users/me/project/scripts/run-pytest.sh`.
+- **Inline paths:** Write `path/to/file` or `scripts/foo.sh`; never embed absolute or user-specific paths.
 
 ## Quick Check
 
-Before returning output, scan for:
+Before returning markdown, scan for:
 
 - `/Users/`, `/home/`, `C:\Users\`
 - Expanded `$HOME` or `~` with a specific path
